@@ -1,7 +1,8 @@
 #std_require iostream
-#require crible_eratosthene cout_vector occtable_to_vector pgcd
-
+#require change_type_vector cumulatif crible_eratosthene cout_vector
 int main() {
-	cout_vector(occtable_to_vector(crible_eratosthene(100)));
+	cout_vector(cumulatif<int>(
+		change_type_vector<bool, int>(crible_eratosthene(100))
+	));
 	return 0;
 }

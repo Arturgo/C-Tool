@@ -2,19 +2,30 @@
 #include <vector>
 using namespace std;
 
+template<class D, class F>
+vector<F> change_type_vector(vector<D> elems);
 template<class T>
 void cout_vector(vector<T> v, string separator = "\n");
 vector<bool> crible_eratosthene(int borneSup);
 template<class T>
-vector<int> occtable_to_vector(vector<T> elems);
-template<class T>
-T pgcd(T a, T b);
-
+vector<T> cumulatif(vector<T> elems);
 int main() {
-	cout_vector(occtable_to_vector(crible_eratosthene(100)));
+	cout_vector(cumulatif<int>(
+		change_type_vector<bool, int>(crible_eratosthene(100))
+	));
 	return 0;
 }
 
+template<class D, class F>
+vector<F> change_type_vector(vector<D> elems) {
+	vector<F> res;
+
+	for(D elem : elems) {
+		res.push_back(elem);
+	}
+
+	return res;
+}
 template<class T>
 void cout_vector(vector<T> v, string separator) {
 	for(T elem : v) {
@@ -37,20 +48,13 @@ vector<bool> crible_eratosthene(int borneSup) {
 	return estPremier;
 }
 template<class T>
-vector<int> occtable_to_vector(vector<T> elems) {
-	vector<int> res;
-	
-	for(int val = 0;val < (int)elems.size();val++) {
-		for(T fois = 0;fois < elems[val];fois++) {
-			res.push_back(val);
-		}
+vector<T> cumulatif(vector<T> elems) {
+	vector<T> res;
+	res.push_back(0);
+
+	for(T elem : elems) {
+		res.push_back(res.back() + elem);
 	}
-	
+
 	return res;
-}
-template<class T>
-T pgcd(T a, T b) {
-	if(a == 0)
-		return b;
-	return pgcd(b % a, a);
 }
