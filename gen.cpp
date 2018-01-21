@@ -12,8 +12,6 @@ T pgcd(T a, T b);
 
 int main() {
 	cout_vector(occtable_to_vector(crible_eratosthene(100)));
-	int a = 2, b = 3;
-	cout << pgcd(a, b) << endl;
 	return 0;
 }
 
