@@ -1,29 +1,84 @@
+#include <algorithm>
 #include <iostream>
 #include <vector>
 using namespace std;
 
-template<class D, class F>
-vector<F> change_type_vector(vector<D> elems);
+template<class T>
+vector<T> cin_vector(int nbElems);
 template<class T>
 void cout_vector(vector<T> v, string separator = "\n");
-vector<bool> crible_eratosthene(int borneSup);
 template<class T>
-vector<T> cumulatif(vector<T> elems);
+void donne_ids(vector<T>& elems);
+template<class T>
+void max_egal(T& a, const T& b);
+
+struct Objet {
+	int temps, disp, valeur, id;
+	Objet(int _temps = 0, int _disp = 0, int _valeur = 0) {
+		temps = _temps;
+		disp = _disp;
+		valeur = _valeur;
+	}
+};
+
+istream& operator>>(istream& is, Objet& obj) {
+    is >> obj.temps >> obj.disp >> obj.valeur;
+    return is;
+}
+
+bool compDisp(const Objet &a, const Objet &b) {
+	return a.disp < b.disp;
+}
+
+int maxValeur[101][2001];
+
 int main() {
-	cout_vector(cumulatif<int>(
-		change_type_vector<bool, int>(crible_eratosthene(100))
-	));
+	int nbObjets;
+	cin >> nbObjets;
+	
+	vector<Objet> objets = cin_vector<Objet>(nbObjets);
+	donne_ids(objets);
+	
+	sort(objets.begin(), objets.end(), compDisp);
+	
+	for(int iObjet = nbObjets - 1;iObjet >= 0;iObjet--) {
+		for(int iTemps = 0;iTemps <= 2000;iTemps++) {
+			max_egal(maxValeur[iObjet][iTemps],
+				maxValeur[iObjet + 1][iTemps]);
+			if(iTemps + objets[iObjet].temps < objets[iObjet].disp)
+				max_egal(maxValeur[iObjet][iTemps],
+					maxValeur[iObjet + 1][iTemps + objets[iObjet].temps] + objets[iObjet].valeur);
+		}
+	}
+	
+	cout << maxValeur[0][0] << endl;
+	
+	vector<int> sol;
+	
+	int temps = 0;
+	for(int iObjet = 0;iObjet < nbObjets;iObjet++) {
+		if(temps + objets[iObjet].temps < objets[iObjet].disp) {
+			if(maxValeur[iObjet + 1][temps + objets[iObjet].temps] + objets[iObjet].valeur > maxValeur[iObjet + 1][temps]) {
+				sol.push_back(objets[iObjet].id + 1);
+				temps += objets[iObjet].temps;
+			}
+		}
+	}
+	
+	cout << sol.size() << endl;
+	cout_vector(sol, " ");
+	cout << endl;
 	return 0;
 }
 
-template<class D, class F>
-vector<F> change_type_vector(vector<D> elems) {
-	vector<F> res;
-
-	for(D elem : elems) {
+template<class T>
+vector<T> cin_vector(int nbElems) {
+	vector<T> res;
+	for(int iElem = 0;iElem < nbElems;iElem++) {
+		T elem;
+		cin >> elem;
 		res.push_back(elem);
 	}
-
 	return res;
 }
 template<class T>
@@ -32,29 +87,15 @@ void cout_vector(vector<T> v, string separator) {
 		cout << elem << separator;
 	}	
 }
-vector<bool> crible_eratosthene(int borneSup) {
-	vector<bool> estPremier(borneSup, true);
-	if(borneSup > 0) estPremier[0] = false;
-	if(borneSup > 1) estPremier[1] = false;
-
-	for(int nombre = 2;nombre * nombre < borneSup;nombre++) {
-		if(!estPremier[nombre])
-			continue;
-		for(int mult = nombre * nombre;mult < borneSup;mult += nombre) {
-			estPremier[mult] = false;
-		}
+template<class T>
+void donne_ids(vector<T>& elems) {
+	for(int iElem = 0;iElem < (int)elems.size();iElem++) {
+		elems[iElem].id = iElem;
 	}
-
-	return estPremier;
 }
 template<class T>
-vector<T> cumulatif(vector<T> elems) {
-	vector<T> res;
-	res.push_back(0);
-
-	for(T elem : elems) {
-		res.push_back(res.back() + elem);
+void max_egal(T& a, const T& b) {
+	if(a < b) {
+		a = b;
 	}
-
-	return res;
 }
