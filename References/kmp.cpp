@@ -1,15 +1,15 @@
 #std_require vector
-template<class Iterator>
-vector<int> kmp(Iterator begin, Iterator end);
+template<class Container>
+vector<int> kmp(Container container);
 #main
-template<class Iterator>
-vector<int> kmp(Iterator begin, Iterator end) {
+template<class Container>
+vector<int> kmp(Container container) {
 	vector<int> bord;
 	bord.push_back(-1);
 	
-	for(Iterator it = begin;it != end;it++) {
+	for(int pos = 0;pos < (int)container.size();pos++) {
 		int cur = bord.back();
-		while(cur != -1 && *it != *(begin + cur)) {
+		while(cur != -1 && container[pos] != container[cur]) {
 			cur = bord[cur];
 		}
 		bord.push_back(cur + 1);

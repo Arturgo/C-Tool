@@ -3,7 +3,7 @@
 
 int main() {
 	string test = "ababacba";
-	vector<int> k = kmp(test.begin(), test.end());
+	vector<int> k = kmp(test);
 	
 	for(int v : k) {
 		cout << v << " ";
