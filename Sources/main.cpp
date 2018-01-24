@@ -6,8 +6,8 @@
 using namespace std;
 
 set<string> includes;
-set<string> solvedReferences;
-set<string> unsolvedReferences;
+set<string> solved;
+vector<string> solvedReferences;
 
 vector<string> readLines(string reference) {
 	ifstream fin;
@@ -110,6 +110,23 @@ void genCode(vector<string> lines) {
 	}
 }
 
+void solveRefs(vector<string> lines) {
+	vector<string> stdRefs = generatedReferences(lines, "#std_require");
+	vector<string> refs = generatedReferences(lines, "#require");
+	
+	for(string ref : stdRefs)
+		if(includes.find(ref) == includes.end())
+			includes.insert(ref);	
+	
+	for(string ref : refs) {
+		if(solved.find(ref) == solved.end()) {
+			solveRefs(readLines(ref + ".cpp"));
+			solvedReferences.push_back(ref);
+			solved.insert(ref);
+		}
+	}
+}
+
 int main() {
 	vector<string> lines;
 	while(!cin.fail()) {
@@ -118,43 +135,8 @@ int main() {
 		if(!cin.fail())
 			lines.push_back(line);
 	}
-
-	vector<string> stdRefs = generatedReferences(lines, "#std_require");
-	for(string ref : stdRefs) {
-		if(includes.find(ref) == includes.end()) {
-			includes.insert(ref);
-		}
-	}
-
-	vector<string> refs = generatedReferences(lines, "#require");
-	for(string ref : refs) {
-		if(unsolvedReferences.find(ref) == unsolvedReferences.end()) {
-			unsolvedReferences.insert(ref);
-		}
-	}
-
-	while(!unsolvedReferences.empty()) {
-		string first = *unsolvedReferences.begin();
-		unsolvedReferences.erase(first);
-
-		if(solvedReferences.find(first) != solvedReferences.end())
-			continue;
-		solvedReferences.insert(first);
-
-		stdRefs = generatedReferences(readLines(first + ".cpp"), "#std_require");
-		for(string ref : stdRefs) {
-			if(includes.find(ref) == includes.end()) {
-				includes.insert(ref);
-			}
-		}
-
-		refs = generatedReferences(readLines(first + ".cpp"), "#require");
-		for(string ref : refs) {
-			if(unsolvedReferences.find(ref) == unsolvedReferences.end()) {
-				unsolvedReferences.insert(ref);
-			}
-		}
-	}
+	
+	solveRefs(lines);
 
 	for(string ref : includes) {
 		cout << "#include <" << ref << ">" << endl;

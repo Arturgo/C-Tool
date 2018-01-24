@@ -1,73 +1,29 @@
 #include <algorithm>
+#include <deque>
+#include <functional>
 #include <iostream>
 #include <vector>
 using namespace std;
 
 template<class T>
 vector<T> cin_vector(int nbElems);
-template<class T>
-void cout_vector(vector<T> v, string separator = "\n");
-template<class T>
-void donne_ids(vector<T>& elems);
-template<class T>
-void max_egal(T& a, const T& b);
 
-struct Objet {
-	int temps, disp, valeur, id;
-	Objet(int _temps = 0, int _disp = 0, int _valeur = 0) {
-		temps = _temps;
-		disp = _disp;
-		valeur = _valeur;
-	}
+template<class T, class Compare>
+struct pfile {
+	size_t debId, finId;
+	deque<pair<T, size_t>> elems;
+	Compare comp;
+	
+	pfile();
+	void push_back(T elem);
+	void pop_front();
+	T top();
+	size_t size();
 };
 
-istream& operator>>(istream& is, Objet& obj) {
-    is >> obj.temps >> obj.disp >> obj.valeur;
-    return is;
-}
-
-bool compDisp(const Objet &a, const Objet &b) {
-	return a.disp < b.disp;
-}
-
-int maxValeur[101][2001];
 
 int main() {
-	int nbObjets;
-	cin >> nbObjets;
 	
-	vector<Objet> objets = cin_vector<Objet>(nbObjets);
-	donne_ids(objets);
-	
-	sort(objets.begin(), objets.end(), compDisp);
-	
-	for(int iObjet = nbObjets - 1;iObjet >= 0;iObjet--) {
-		for(int iTemps = 0;iTemps <= 2000;iTemps++) {
-			max_egal(maxValeur[iObjet][iTemps],
-				maxValeur[iObjet + 1][iTemps]);
-			if(iTemps + objets[iObjet].temps < objets[iObjet].disp)
-				max_egal(maxValeur[iObjet][iTemps],
-					maxValeur[iObjet + 1][iTemps + objets[iObjet].temps] + objets[iObjet].valeur);
-		}
-	}
-	
-	cout << maxValeur[0][0] << endl;
-	
-	vector<int> sol;
-	
-	int temps = 0;
-	for(int iObjet = 0;iObjet < nbObjets;iObjet++) {
-		if(temps + objets[iObjet].temps < objets[iObjet].disp) {
-			if(maxValeur[iObjet + 1][temps + objets[iObjet].temps] + objets[iObjet].valeur > maxValeur[iObjet + 1][temps]) {
-				sol.push_back(objets[iObjet].id + 1);
-				temps += objets[iObjet].temps;
-			}
-		}
-	}
-	
-	cout << sol.size() << endl;
-	cout_vector(sol, " ");
-	cout << endl;
 	return 0;
 }
 
@@ -81,21 +37,34 @@ vector<T> cin_vector(int nbElems) {
 	}
 	return res;
 }
-template<class T>
-void cout_vector(vector<T> v, string separator) {
-	for(T elem : v) {
-		cout << elem << separator;
-	}	
+template<class T, class Compare>
+pfile<T, Compare>::pfile() {
+	debId = finId = 0;
+	comp = Compare();
 }
-template<class T>
-void donne_ids(vector<T>& elems) {
-	for(int iElem = 0;iElem < (int)elems.size();iElem++) {
-		elems[iElem].id = iElem;
+
+template<class T, class Compare>
+void pfile<T, Compare>::push_back(T elem) {
+	while(!elems.empty() && comp(elem, elems.back().first)) {
+		elems.pop_back();
 	}
+	elems.push_back({elem, finId++});
 }
-template<class T>
-void max_egal(T& a, const T& b) {
-	if(a < b) {
-		a = b;
-	}
+
+template<class T, class Compare>
+T pfile<T, Compare>::top() {
+	return elems.front().first;
+}
+
+template<class T, class Compare>
+size_t pfile<T, Compare>::size() {
+	return finId - debId;
+}
+
+template<class T, class Compare>
+void pfile<T, Compare>::pop_front() {
+	if(elems.front().second == debId)
+		elems.pop_front();
+	debId++;
+	finId = max(finId, debId);
 }
