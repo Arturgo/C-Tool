@@ -1,70 +1,35 @@
 #include <algorithm>
-#include <deque>
 #include <functional>
 #include <iostream>
 #include <vector>
 using namespace std;
 
-template<class T>
-vector<T> cin_vector(int nbElems);
-
-template<class T, class Compare>
-struct pfile {
-	size_t debId, finId;
-	deque<pair<T, size_t>> elems;
-	Compare comp;
-	
-	pfile();
-	void push_back(T elem);
-	void pop_front();
-	T top();
-	size_t size();
-};
-
+template<class Iterator>
+vector<int> kmp(Iterator begin, Iterator end);
 
 int main() {
+	string test = "ababacba";
+	vector<int> k = kmp(test.begin(), test.end());
 	
+	for(int v : k) {
+		cout << v << " ";
+		cout << endl;
+	}
 	return 0;
 }
 
-template<class T>
-vector<T> cin_vector(int nbElems) {
-	vector<T> res;
-	for(int iElem = 0;iElem < nbElems;iElem++) {
-		T elem;
-		cin >> elem;
-		res.push_back(elem);
+template<class Iterator>
+vector<int> kmp(Iterator begin, Iterator end) {
+	vector<int> bord;
+	bord.push_back(-1);
+	
+	for(Iterator it = begin;it != end;it++) {
+		int cur = bord.back();
+		while(cur != -1 && *it != *(begin + cur)) {
+			cur = bord[cur];
+		}
+		bord.push_back(cur + 1);
 	}
-	return res;
-}
-template<class T, class Compare>
-pfile<T, Compare>::pfile() {
-	debId = finId = 0;
-	comp = Compare();
-}
-
-template<class T, class Compare>
-void pfile<T, Compare>::push_back(T elem) {
-	while(!elems.empty() && comp(elem, elems.back().first)) {
-		elems.pop_back();
-	}
-	elems.push_back({elem, finId++});
-}
-
-template<class T, class Compare>
-T pfile<T, Compare>::top() {
-	return elems.front().first;
-}
-
-template<class T, class Compare>
-size_t pfile<T, Compare>::size() {
-	return finId - debId;
-}
-
-template<class T, class Compare>
-void pfile<T, Compare>::pop_front() {
-	if(elems.front().second == debId)
-		elems.pop_front();
-	debId++;
-	finId = max(finId, debId);
+	
+	return bord;
 }
