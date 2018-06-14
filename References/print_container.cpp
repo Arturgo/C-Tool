@@ -1,12 +1,12 @@
 #std_require iostream
 
 template<typename Container>
-void print(const Container& container, ostream& stream = cout);
+void print_container(const Container& container, ostream& stream = cout);
 
 #main
 
 template<typename Container>
-void print(const Container& container, ostream& stream) {
+void print_container(const Container& container, ostream& stream) {
   #ifndef print_hide_size
   stream << container.size() << endl;
   #endif
@@ -19,6 +19,6 @@ void print(const Container& container, ostream& stream) {
   }
   
   #ifndef print_no_endl
-  cout << endl;
+  stream << endl;
   #endif
 }
