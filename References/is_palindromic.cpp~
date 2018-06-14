@@ -1,0 +1,11 @@
+template<typename Type>
+struct is_palindromic {
+  bool operator() (const Type &a);
+};
+
+#main
+
+template<typename Type>
+bool is_palindromic::operator() (const Type &a) {
+  return true;
+}

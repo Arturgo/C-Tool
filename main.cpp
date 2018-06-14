@@ -1,7 +1,10 @@
 #std_require vector iostream
-#require sum print filter range fibonacci key_set prime_decomposition value_set max_value
+#require cartesian_sum range max_value filter is_palindromic
 
 int main() {
-  cout << max_value(key_set<vector<int>>(prime_decomposition<vector<pair<long long, int>>>(600851475143ll))) << endl;
+  vector<int> three_digits = range<vector<int>>(100, 1000);
+  vector<int> product = cartesian_sum(three_digits, three_digits, multiplies<int>());
+  vector<int> palindromes = filter(product, is_palindromic_number<int>());
+  cout << max_value(palindromes) << endl;
   return 0;
 }
