@@ -1,10 +1,9 @@
 #std_require vector iostream
-#require cartesian_sum range max_value filter is_palindromic
+#require prime_table table_to_container
 
 int main() {
-  vector<int> three_digits = range<vector<int>>(100, 1000);
-  vector<int> product = cartesian_sum(three_digits, three_digits, multiplies<int>());
-  vector<int> palindromes = filter(product, is_palindromic_number<int>());
-  cout << max_value(palindromes) << endl;
+  vector<bool> table = prime_table<vector<bool>>(4000000);
+  vector<int> primes = table_to_container<vector<int>>(table);
+  cout << primes[10000]  << endl;
   return 0;
 }
