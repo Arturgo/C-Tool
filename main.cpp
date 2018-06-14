@@ -1,24 +1,21 @@
 #std_require vector iostream algorithm string
-#require read_container print_container apply add signature
+#require is_palindromic subsequence
 
 int main() {
   ios_base::sync_with_stdio(false);
-  auto permutation = read_container<vector<int>>();
-  permutation = apply<vector<int>>(permutation, add<int>(-1));
+  string s;
+  getline(cin, s);
 
-  int sign = signature(permutation);
-  if(permutation.size() % 2 == 0) {
-    if(sign == 1)
-      cout << "Petr" << endl;
-    else
-      cout << "Um_nik" << endl;
+  size_t maxSize = 0;
+  for(size_t begin = 0;begin < s.size();begin++) {
+    for(size_t end = begin + 1;end <= s.size();end++) {
+      if(!is_palindromic_sequence(subsequence(s, begin, end))) {
+	maxSize = max(maxSize, end - begin);
+      }
+    }
   }
-  else {
-    if(sign == 1)
-      cout << "Um_nik" << endl;
-    else
-      cout << "Petr" << endl;
-  }
+
+  cout << maxSize << endl;
   
   return 0;
 }
