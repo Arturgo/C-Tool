@@ -1,21 +1,49 @@
-#std_require vector iostream algorithm string
-#require is_palindromic subsequence
+#std_require vector iostream cstdio
+#require fast_io undirected_graph
 
 int main() {
-  ios_base::sync_with_stdio(false);
-  string s;
-  getline(cin, s);
+  fast_io();
+  int nbNodes;
+  cin >> nbNodes;
 
-  size_t maxSize = 0;
-  for(size_t begin = 0;begin < s.size();begin++) {
-    for(size_t end = begin + 1;end <= s.size();end++) {
-      if(!is_palindromic_sequence(subsequence(s, begin, end))) {
-	maxSize = max(maxSize, end - begin);
-      }
+  undirected_graph<int> graph;
+
+  for(int iNode = 0;iNode < nbNodes;iNode++) {
+    graph.add_node(iNode);
+  }
+
+  for(int iEdge = 0;iEdge < nbNodes - 1;iEdge++) {
+    int deb, fin;
+    cin >> deb >> fin;
+    graph.add_edge_id(deb - 1, fin - 1);
+  }
+
+  vector<int> stars, leaves;
+  for(int iNode = 0;iNode < nbNodes;iNode++) {
+    if(graph.childs[iNode].size() > 2) {
+      stars.push_back(iNode);
+    }
+    if(graph.childs[iNode].size() == 1) {
+      leaves.push_back(iNode);
     }
   }
 
-  cout << maxSize << endl;
-  
+  if(stars.size() > 1) {
+    cout << "No" << endl;
+  }
+  else {
+    cout << "Yes" << endl;
+    if(stars.empty())
+      stars.push_back(0);
+    vector<pair<int, int>> paths;
+    for(int leave : leaves) {
+      if(leave != stars[0])
+	paths.push_back({leave, stars[0]});
+    }
+    cout << paths.size() << endl;
+    for(pair<int, int> path : paths) {
+      cout << path.first + 1 << " " << path.second + 1 << endl;
+    }
+  }
   return 0;
 }
