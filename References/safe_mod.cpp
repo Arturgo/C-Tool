@@ -1,7 +1,9 @@
-long long safe_mod(long long a, long long mod);
+template<typename Integer>
+Integer safe_mod(Integer a, Integer mod);
 
 #main
 
-long long safe_mod(long long a, long long mod) {
+template<typename Integer>
+Integer safe_mod(Integer a, Integer mod) {
   return ((a % mod) + mod) % mod;
 }

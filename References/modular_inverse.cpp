@@ -1,26 +1,9 @@
-#include <iostream>
-using namespace std;
-
-template<typename Integer>
-Integer safe_mod(Integer a, Integer mod);
-
+#require safe_mod
 
 template<class Integer>
 Integer modular_inverse(Integer a, Integer mod);
 
-
-int main() {
-  long long a, mod;
-  cin >> a >> mod;
-  cout << modular_inverse(a, mod) << endl;
-  return 0;
-}
-
-
-template<typename Integer>
-Integer safe_mod(Integer a, Integer mod) {
-  return ((a % mod) + mod) % mod;
-}
+#main
 
 template<class Integer>
 Integer modular_inverse(Integer a, Integer mod) {
