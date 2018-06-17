@@ -1,122 +1,161 @@
-#include <cstdio>
+#include <cmath>
 #include <iostream>
-#include <map>
 #include <vector>
 using namespace std;
 
-void fast_io();
 
-
-template<typename Node, typename Map = map<Node, size_t> >
-class directed_graph {
+template<typename Type>
+class point {
 public:
-  typedef Node node_type;
-  
-  Map r_nodes;
-  vector<Node> nodes;
-  vector<vector<size_t>> childs, parents;
-  
-  directed_graph();
-  void add_node(const Node& node);
-  void add_edge(const Node& begin, const Node& end);
-  void add_edge_id(size_t begin, size_t end);
+  Type x, y;
+  point(Type _x = 0, Type _y = 0);
 };
 
+template<typename Type>
+point<Type> operator + (const point<Type> &a, const point<Type> &b);
 
-template<typename Node, typename Map = map<Node, size_t>>
-class undirected_graph : public directed_graph<Node, Map> {
-public:
-  void add_edge(const Node &begin, const Node &end);
-  void add_edge_id(size_t begin, size_t end);
-};
+template<typename Type>
+point<Type> operator - (const point<Type> &a, const point<Type> &b);
 
+template<typename Type>
+point<Type> operator * (const Type &a, const point<Type> &b);
+
+template<typename Type>
+Type operator * (const point<Type> &a, const point<Type> &b);
+
+template<typename Type>
+Type operator ^ (const point<Type> &a, const point<Type> &b);
+
+template<typename Type>
+long double operator ! (const point<Type> &a);
+
+template<typename Integer>
+int sign(Integer a);
+
+
+template<typename Segment>
+bool intersects(const Segment &a, const Segment &b);
+
+
+template<typename Point, typename Polygon>
+bool is_in(const Point &a, const Polygon &b, long long sizeS = 2000 * 1000 * 1000);
+
+
+vector<point<long long>> read_poly() {
+  vector<point<long long>> points;
+  for(int iPoint = 0;iPoint < 4;iPoint++) {
+    int a, b;
+    cin >> a >> b;
+    points.push_back(point<long long>(a, b));
+  }
+  return points;
+}
+    
 
 int main() {
-  fast_io();
-  int nbNodes;
-  cin >> nbNodes;
+  vector<point<long long>> polyA = read_poly();
+  vector<point<long long>> polyB = read_poly();
 
-  undirected_graph<int> graph;
-
-  for(int iNode = 0;iNode < nbNodes;iNode++) {
-    graph.add_node(iNode);
-  }
-
-  for(int iEdge = 0;iEdge < nbNodes - 1;iEdge++) {
-    int deb, fin;
-    cin >> deb >> fin;
-    graph.add_edge_id(deb - 1, fin - 1);
-  }
-
-  vector<int> stars, leaves;
-  for(int iNode = 0;iNode < nbNodes;iNode++) {
-    if(graph.childs[iNode].size() > 2) {
-      stars.push_back(iNode);
-    }
-    if(graph.childs[iNode].size() == 1) {
-      leaves.push_back(iNode);
+  for(int cA = 0;cA < 4;cA++) {
+    for(int cB = 0;cB < 4;cB++) {
+      int nA = (cA + 1) % 4;
+      int nB = (cB + 1) % 4;
+      if(intersects(make_pair(polyA[nA], polyA[cA]), make_pair(polyB[nB], polyB[cB]))) {
+	cout << "YES" << endl;
+	return 0;
+      }
     }
   }
 
-  if(stars.size() > 1) {
-    cout << "No" << endl;
+  bool AinB = true;
+  for(int cA = 0;cA < 4;cA++) {
+    if(!is_in(polyA[cA], polyB)) {
+      AinB = false;
+    }
+  }
+
+  bool BinA = true;
+  for(int cB = 0;cB < 4;cB++) {
+    if(!is_in(polyB[cB], polyA)) {
+      BinA = false;
+    }
+  }
+
+  if(AinB || BinA) {
+    cout << "YES" << endl;
   }
   else {
-    cout << "Yes" << endl;
-    if(stars.empty())
-      stars.push_back(0);
-    vector<pair<int, int>> paths;
-    for(int leave : leaves) {
-      if(leave != stars[0])
-	paths.push_back({leave, stars[0]});
-    }
-    cout << paths.size() << endl;
-    for(pair<int, int> path : paths) {
-      cout << path.first + 1 << " " << path.second + 1 << endl;
-    }
+    cout << "NO" << endl;
   }
   return 0;
 }
 
 
-void fast_io() {
-  ios_base::sync_with_stdio(false);
-  cin.tie(NULL);
-  cout.tie(NULL);
+template<typename Type>
+point<Type> operator + (const point<Type> &a, const point<Type> &b) {
+  return point<Type>(a.x + b.x, a.y + b.y);
 }
 
-template<typename Node, typename Map>
-directed_graph<Node, Map>::directed_graph() {
+template<typename Type>
+point<Type> operator - (const point<Type> &a, const point<Type> &b) {
+  return point<Type>(a.x - b.x, a.y - b.y);
 }
 
-template<typename Node, typename Map>
-void directed_graph<Node, Map>::add_node(const Node& node) {
-  r_nodes[node] = nodes.size();
-  nodes.push_back(node);
-  childs.push_back({});
-  parents.push_back({});
+template<typename Type>
+point<Type> operator * (const Type &a, const point<Type> &b) {
+  return point<Type>(a * b.x, a * b.y);
 }
 
-template<typename Node, typename Map>
-void directed_graph<Node, Map>::add_edge(const Node& begin, const Node& end) {
-  add_edge_id(r_nodes[begin], r_nodes[end]);
+template<typename Type>
+Type operator * (const point<Type> &a, const point<Type> &b) {
+  return a.x * b.x + a.y * b.y;
 }
 
-template<typename Node, typename Map>
-void directed_graph<Node, Map>::add_edge_id(size_t begin, size_t end) {
-  childs[begin].push_back(end);
-  parents[end].push_back(begin);
+template<typename Type>
+Type operator ^ (const point<Type> &a, const point<Type> &b) {
+  return a.x * b.y - a.y * b.x;
 }
 
-template<typename Node, typename Map>
-void undirected_graph<Node, Map>::add_edge(const Node &begin, const Node &end) {
-  add_edge_id(directed_graph<Node, Map>::r_nodes[begin], directed_graph<Node, Map>::r_nodes[end]);
+template<typename Type>
+long double operator ! (const point<Type> &a) {
+  return sqrt(a * a);
 }
 
-template<typename Node, typename Map>
-void undirected_graph<Node, Map>::add_edge_id(size_t begin, size_t end) {
-  directed_graph<Node, Map>::childs[begin].push_back(end);
-  directed_graph<Node, Map>::childs[end].push_back(begin);
-  directed_graph<Node, Map>::parents[begin].push_back(end);
-  directed_graph<Node, Map>::parents[end].push_back(begin);
+template<typename Type>
+point<Type>::point(Type _x, Type _y) {
+  x = _x;
+  y = _y;
+}
+
+
+template<typename Integer>
+int sign(Integer a) {
+  if(a < 0)
+    return -1;
+  if(a > 0)
+    return 1;
+  return 0;
+}
+
+template<typename Segment>
+bool intersects(const Segment &a, const Segment &b) {
+  return sign((a.second - a.first) ^ (b.first - a.first)) != sign((a.second - a.first) ^ (b.second - a.first)) && sign((b.second - b.first) ^ (a.first - b.first)) != sign((b.second - b.first) ^ (a.second - b.first));
+}
+
+template<typename Point, typename Polygon>
+bool is_in(const Point &a, const Polygon &b, long long sizeS) {
+  pair<Point, Point> segment = make_pair(a, a + Point(1, sizeS));
+
+  int count = 0;
+
+  for(int c = 0;c < (int)b.size();c++) {
+    int n = (c + 1) % b.size();
+    if(intersects(segment, make_pair(b[c], b[n]))) {
+      count++;
+    }
+  }
+
+  if(count % 2 == 0)
+    return false;
+  return true;
 }

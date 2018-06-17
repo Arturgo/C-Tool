@@ -1,0 +1,6 @@
+table = table d'occurence
+container = map indice->truc
+
+Corriger tout ca !!!
+
+Réfléchir à la définition de WeightContainer dans un graphe : peut-être créer un type weighted_graph
